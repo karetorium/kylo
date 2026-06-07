@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kylo's Karetorium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--pink:#FF5BA8;--purple:#8B47E0;--blue:#16B9F5;--mint:#0AE3C4;--yel:#FFD23F;--ink:#241B2F;--soft:#FFF2F9;--lilac:#F4ECFE;--grey:#9A93A8;--paper:#FFFCF7;--line:#EEE3F7;--shadow:0 14px 34px -12px rgba(139,71,224,.32);}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Nunito',sans-serif;color:var(--ink);background:radial-gradient(circle at 12% 4%,#FFE4F1 0,transparent 42%),radial-gradient(circle at 88% 2%,#DFF6FF 0,transparent 38%),radial-gradient(circle at 50% 112%,#EFE3FE 0,transparent 56%),var(--paper);background-attachment:fixed;min-height:100vh;}
+  h1,h2,h3{font-family:'Fredoka',sans-serif;letter-spacing:-.4px;}
+  #loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  #loading p{color:var(--grey);font-size:.9rem;font-weight:600}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}
+  #loading svg{animation:float 1.8s ease-in-out infinite}
+  #doors{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:30px;}
+  @keyframes pop{from{transform:scale(.3) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+  .crest{animation:pop .6s cubic-bezier(.2,1.4,.5,1);}
+  #doors h1{font-size:2.6rem;color:var(--purple);text-align:center;line-height:1;}
+  #doors .tag{color:var(--pink);font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:.78rem;margin-top:6px;text-align:center;}
+  .doorrow{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
+  .door{width:235px;background:#fff;border-radius:26px;padding:28px 22px;text-align:center;cursor:pointer;box-shadow:var(--shadow);border:3px solid #fff;transition:.2s cubic-bezier(.2,1,.4,1);}
+  .door:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 22px 40px -14px rgba(139,71,224,.42);}
+  .door .ic{font-size:2.6rem;} .door h3{font-size:1.25rem;margin:10px 0 4px;color:var(--ink);} .door p{font-size:.86rem;color:var(--grey);line-height:1.45;}
+  .app{display:none;} .app.show{display:block;}
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(255,252,247,.88);backdrop-filter:blur(14px);border-bottom:2px solid var(--line);display:flex;align-items:center;gap:12px;padding:11px 18px;}
+  .bn{font-family:'Fredoka';font-weight:700;font-size:1.25rem;color:var(--purple);line-height:1;}
+  .bs{font-size:.64rem;color:var(--pink);font-weight:800;letter-spacing:.7px;text-transform:uppercase;margin-top:2px}
+  .roleswitch{margin-left:auto;font-size:.74rem;color:var(--grey);background:#fff;border:2px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer;font-family:'Fredoka';font-weight:600;transition:.15s}
+  .roleswitch:hover{border-color:var(--pink);color:var(--pink)}
+  .tabs{display:flex;gap:6px;padding:12px 16px 0;flex-wrap:wrap;}
+  .tab{font-family:'Fredoka';font-size:.82rem;font-weight:600;border:none;cursor:pointer;padding:9px 15px;border-radius:999px;background:#fff;color:var(--ink);box-shadow:0 2px 8px -3px rgba(139,71,224,.2);transition:.16s;}
+  .tab.active{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;transform:translateY(-1px);box-shadow:0 6px 14px -5px rgba(255,91,168,.6)}
+  .wrap{max-width:880px;margin:18px auto;padding:0 16px 80px;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .wrap>*{animation:rise .35s cubic-bezier(.2,1,.4,1) both}
+  .card{background:#fff;border-radius:24px;padding:24px;margin-bottom:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue),var(--mint))}
+  .card h2{font-size:1.32rem;color:var(--purple);} .card .sub{color:var(--grey);font-size:.88rem;margin:3px 0 16px;line-height:1.4}
+  .zone{border-radius:16px;overflow:hidden;margin-bottom:12px;border:1.5px solid var(--line);}
+  .zone-h{padding:10px 14px;color:#fff;font-family:'Fredoka';font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+  .zone-h .days{display:flex;gap:9px} .zone-h .days span{width:24px;text-align:center;font-size:.74rem;opacity:.95}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid var(--line);background:#fff;}
+  .row:nth-child(even){background:var(--soft);}
+  .task{font-size:.92rem;flex:1;} .task[contenteditable]:focus{outline:none;background:#fff5fb;box-shadow:0 0 0 2px var(--pink);border-radius:6px;}
+  .dots{display:flex;gap:9px} .dot{width:22px;height:22px;border-radius:50%;border:2px solid #d9dbe6;cursor:pointer;background:#fff;transition:.14s cubic-bezier(.2,1.5,.4,1);flex:0 0 22px}
+  .dot.on{background:var(--mint);border-color:var(--mint);box-shadow:inset 0 0 0 3px rgba(255,255,255,.6);transform:scale(1.05)}
+  .blue .zone-h{background:linear-gradient(120deg,var(--blue),#5fd0ff)} .pink .zone-h{background:linear-gradient(120deg,var(--pink),#ff86c1)}
+  .purpur .zone-h{background:linear-gradient(120deg,var(--purple),#a96ef0)} .mint .zone-h{background:linear-gradient(120deg,var(--mint),#5cf0d8)} .yel .zone-h{background:linear-gradient(120deg,var(--yel),#ffe27a);color:var(--ink)}
+  .btn{font-family:'Fredoka';font-weight:600;border:none;cursor:pointer;border-radius:999px;padding:11px 18px;font-size:.88rem;background:var(--yel);color:var(--ink);box-shadow:0 4px 0 #d9af19;transition:.12s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 #d9af19}
+  .btn.p{background:linear-gradient(135deg,var(--purple),#a05ff0);color:#fff;box-shadow:0 4px 0 #6a32b3} .btn.p:active{box-shadow:0 1px 0 #6a32b3}
+  .btn.k{background:linear-gradient(135deg,var(--pink),#ff86c1);color:#fff;box-shadow:0 4px 0 #d23d85} .btn.k:active{box-shadow:0 1px 0 #d23d85}
+  .btn.big-share{font-size:1rem;padding:14px 22px;width:100%;justify-content:center}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+  .sm{font-size:.78rem;color:var(--grey);line-height:1.4}
+  label.fld{display:block;font-weight:800;font-size:.72rem;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 5px}
+  input.t,textarea.t,select.t{width:100%;font-family:'Nunito';font-size:.96rem;border:2px solid var(--line);border-radius:13px;padding:10px 13px;color:var(--ink);background:#fff;transition:.15s}
+  input.t:focus,textarea.t:focus,select.t:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,91,168,.13)}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:580px){.twocol{grid-template-columns:1fr}.zone-h .days span{width:18px}.dot{width:18px;height:18px;flex-basis:18px}}
+  .recap{background:linear-gradient(160deg,var(--lilac),#fff);border-radius:16px;padding:18px;white-space:pre-wrap;font-size:.93rem;line-height:1.55;border:1.5px dashed var(--purple)}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:6px 0 14px}
+  .stat{background:linear-gradient(160deg,#fff,var(--lilac));border-radius:18px;padding:18px 14px;text-align:center;box-shadow:0 6px 16px -8px rgba(139,71,224,.3)}
+  .big{font-family:'Fredoka';font-weight:700;font-size:2.7rem;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+  .stat .l{font-size:.7rem;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;font-weight:800;margin-top:6px}
+  .carecard{width:330px;max-width:100%;border-radius:20px;padding:24px 22px;color:#fff;background:linear-gradient(135deg,var(--purple) 0,var(--pink) 70%,#ff86c1 100%);box-shadow:0 18px 40px -14px rgba(139,71,224,.6);position:relative;overflow:hidden}
+  .carecard::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.13)}
+  .carecard::before{content:"";position:absolute;left:-20px;bottom:-30px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.08)}
+  .grade{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+  .stars{color:var(--yel);font-size:1.2rem;letter-spacing:3px}
+  .upsell{border-radius:18px;padding:18px;margin-top:12px;color:#fff;background:linear-gradient(135deg,var(--purple),var(--pink));box-shadow:0 10px 24px -12px rgba(139,71,224,.5)}
+  .upsell b{font-family:'Fredoka';font-size:1.08rem} .upsell p{font-size:.88rem;margin-top:5px;opacity:.92;line-height:1.45}
+  .banner{border-radius:16px;padding:14px 16px;margin-top:12px;font-weight:700;display:flex;align-items:center;gap:10px;background:linear-gradient(120deg,var(--mint),var(--blue));color:#fff;box-shadow:0 8px 20px -10px rgba(10,227,196,.7)}
+  .quote{background:var(--soft);border-left:4px solid var(--pink);border-radius:0 14px 14px 0;padding:14px 16px;margin-top:12px;font-size:.95rem;line-height:1.5;font-style:italic;color:#5e4a66}
+  .pill{display:inline-block;font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.4px}
+  @media print{.topbar,.tabs,.roleswitch,.btnrow,.btn,.noprint,#doors{display:none!important}.app{display:block!important}body{background:#fff}.card{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid}.card::before{display:none}}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <svg width="78" height="78" viewBox="0 0 100 100"><polygon points="50,4 60,32 90,30 66,50 78,80 50,62 22,80 34,50 10,30 40,32" fill="#FFD23F" stroke="#241B2F" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="52" r="11" fill="#241B2F"/><circle cx="38" cy="42" r="4.5" fill="#241B2F"/><circle cx="50" cy="38" r="4.5" fill="#241B2F"/><circle cx="62" cy="42" r="4.5" fill="#241B2F"/></svg>
+  <p>Loading…</p>
+</div>
+
+<div id="doors">
+  <svg class="crest" width="90" height="90" viewBox="0 0 100 100"><polygon points="50,4 60,32 90,30 66,50 78,80 50,62 22,80 34,50 10,30 40,32" fill="#FFD23F" stroke="#241B2F" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="52" r="11" fill="#241B2F"/><circle cx="38" cy="42" r="4.5" fill="#241B2F"/><circle cx="50" cy="38" r="4.5" fill="#241B2F"/><circle cx="62" cy="42" r="4.5" fill="#241B2F"/></svg>
+  <div><h1>Kylo's Karetorium</h1><div class="tag">Cared for like the star he is</div></div>
+  <div class="doorrow">
+    <div class="door" onclick="tryProvider()"><div class="ic">🎀</div><h3>Care HQ</h3><p>Your control panel — chart, recaps, report cards, members.</p></div>
+    <div class="door" onclick="enter('client')"><div class="ic">🐾</div><h3>Kylo's Portal</h3><p>Kylo's week, check-in, and care card.</p></div>
+  </div>
+  <p class="sm" id="doorStatus" style="margin-top:2px">One system · live link keeps you both current</p>
+</div>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <svg style="width:38px;height:38px;flex:0 0 38px" viewBox="0 0 100 100"><polygon points="50,4 60,32 90,30 66,50 78,80 50,62 22,80 34,50 10,30 40,32" fill="#FFD23F" stroke="#241B2F" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="52" r="11" fill="#241B2F"/><circle cx="38" cy="42" r="4.5" fill="#241B2F"/><circle cx="50" cy="38" r="4.5" fill="#241B2F"/><circle cx="62" cy="42" r="4.5" fill="#241B2F"/></svg>
+    <div><div class="bn">Kylo's Karetorium</div><div class="bs" id="roleLabel">Care HQ</div></div>
+    <button class="roleswitch" id="switchBtn" onclick="goDoors()">⇄ switch view</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="wrap" id="wrap"></div>
+</div>
+
+<div id="pwModal" style="display:none;position:fixed;inset:0;background:rgba(36,27,47,.78);backdrop-filter:blur(10px);z-index:200;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:26px;padding:36px 28px;max-width:300px;width:90%;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,.35)">
+    <div style="font-size:2.4rem">🔐</div>
+    <h2 style="color:var(--purple);margin:12px 0 4px">Care HQ</h2>
+    <p style="font-size:.84rem;color:var(--grey);margin-bottom:18px">Curator access only.</p>
+    <input class="t" type="password" id="pwInput" placeholder="Password" style="text-align:center;letter-spacing:5px;font-size:1.1rem;margin-bottom:6px" onkeydown="if(event.key==='Enter')submitPw()">
+    <div id="pwErr" style="color:var(--pink);font-size:.8rem;min-height:20px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn" onclick="closePw()">Cancel</button>
+      <button class="btn p" onclick="submitPw()">Enter ✓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ZONES=[
+  {cls:'blue',title:'WALKS & OUTDOORS',tasks:['Main walk + outdoor play','Fresh walk-water bottle','Poop pick-up & disposal','Paw + coat wipe after','Second short walk (as available)']},
+  {cls:'pink',title:'DAILY CARE',tasks:['Fresh water, refilled','Feeding','Eyes wiped','Paws checked & wiped','Brush / quick groom','Training, play & cuddle','A few good treats']},
+  {cls:'mint',title:'HOME RESET',tasks:['Surfaces tidied & reset','Dog area cleaned up']},
+  {cls:'purpur',title:'WEEKLY',tasks:['Laundry — towels, linens, household','Bonus deep bathroom (1×)']},
+  {cls:'yel',title:'SPECIAL TOUCHES',tasks:['','']}
+];
+const DAYS=['M','T','W','TH','F'];
+function blank(){return{chart:ZONES.map(z=>z.tasks.map(()=>[0,0,0,0,0])),special:['',''],detail:'',note:'',photos:'',album:'',week:'',recapTone:'warm',highlights:[],daily:{date:'',walk:'',q:{},photos:'',note:''},survey:null,member:{name:'Kylo & Kerem',tier:'WALKS + RESET',since:'June 2026',no:'KK-001'}};}
+
+/* ===== STATE ===== */
+let D=null,sharedView=false,currentId=null,role='provider';
+let roomUri=null,lastSeen=null,writeTimer=null,polling=false;
+function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
+function dec(s){return JSON.parse(decodeURIComponent(escape(atob(s))))}
+function editing(){const a=document.activeElement;return a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.isContentEditable);}
+function shown(){return document.getElementById('app').classList.contains('show');}
+
+/* ===== FREE CLOUD SYNC (jsonstorage.net — no account, CORS) ===== */
+const API='https://api.jsonstorage.net/v1/json';
+async function apiCreate(obj){try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(obj)});if(!r.ok)return null;const j=await r.json();return j.uri||(j.id?API+'/'+j.id:null);}catch(e){return null;}}
+async function apiGet(uri){try{const r=await fetch(uri,{cache:'no-store'});if(!r.ok)return null;return await r.json();}catch(e){return null;}}
+async function apiPut(uri,obj){try{await fetch(uri,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(obj)});return true;}catch(e){return false;}}
+
+async function localLoad(){try{const r=await window.storage.get('kk_data');D=JSON.parse(r.value);}catch{D=blank();}}
+async function localSave(){try{await window.storage.set('kk_data',JSON.stringify(D));}catch(e){}}
+
+function save(){ /* provider edits */
+  if(sharedView)return;
+  if(roomUri){clearTimeout(writeTimer);writeTimer=setTimeout(pushProvider,700);}
+  else localSave();
+}
+async function pushProvider(){
+  if(!roomUri)return;
+  const remote=await apiGet(roomUri);
+  if(remote&&remote.survey)D.survey=remote.survey; // keep Kerem's latest check-in
+  await apiPut(roomUri,D);lastSeen=JSON.stringify(D);
+}
+function startPoll(){
+  if(polling||!roomUri)return;polling=true;
+  setInterval(async()=>{
+    if(!roomUri)return;
+    const v=await apiGet(roomUri);if(!v)return;
+    const s=JSON.stringify(v);
+    if(s!==lastSeen){lastSeen=s;D=v;if(!editing()&&currentId&&shown())render(currentId);}
+  },8000);
+}
+
+async function createRoom(){
+  const uri=await apiCreate(D);
+  if(uri){roomUri=uri;lastSeen=JSON.stringify(D);try{await window.storage.set('kk_room',uri);}catch(e){}startPoll();return true;}
+  return false;
+}
+function liveLink(){return roomUri?location.origin+location.pathname+'#room='+enc(roomUri):null;}
+
+async function init(){
+  const h=location.hash;
+  if(h.indexOf('#room=')===0){try{roomUri=dec(h.slice(6));}catch(e){}}
+  else if(h.indexOf('#k=')===0){try{D=dec(h.slice(3));sharedView=true;}catch(e){}}
+  if(!roomUri&&!sharedView){try{const r=await window.storage.get('kk_room');if(r&&r.value)roomUri=r.value;}catch(e){}}
+  if(sharedView){D=D||blank();}
+  else if(roomUri){const v=await apiGet(roomUri);if(v){D=v;lastSeen=JSON.stringify(D);startPoll();}else{roomUri=null;await localLoad();}}
+  else{await localLoad();}
+  document.getElementById('loading').style.display='none';
+  if(sharedView){
+    role='client';document.getElementById('doors').style.display='none';document.getElementById('app').classList.add('show');
+    document.getElementById('roleLabel').textContent="Kylo's Portal";document.getElementById('switchBtn').style.display='none';buildTabs();
+  }else{
+    document.getElementById('doorStatus').textContent=roomUri?'🟢 Live link active — you both see updates':'One system · create your live link in Care HQ';
+    document.getElementById('doors').style.display='flex';
+  }
+}
+init();
+
+function enter(r){role=r;document.getElementById('doors').style.display='none';document.getElementById('app').classList.add('show');document.getElementById('roleLabel').textContent=r==='provider'?'Care HQ · Madeline':"Kylo's Portal · Kerem";buildTabs();}
+function goDoors(){document.getElementById('app').classList.remove('show');document.getElementById('doors').style.display='flex';}
+function tryProvider(){const m=document.getElementById('pwModal');m.style.display='flex';document.getElementById('pwInput').value='';document.getElementById('pwErr').textContent='';setTimeout(()=>document.getElementById('pwInput').focus(),80);}
+function closePw(){document.getElementById('pwModal').style.display='none';}
+function submitPw(){if(document.getElementById('pwInput').value==='kylo2026'){closePw();enter('provider');}else{document.getElementById('pwErr').textContent='Incorrect — try again.';document.getElementById('pwInput').value='';document.getElementById('pwInput').focus();}}
+
+function metrics(){const mainWalks=D.chart[0][0].filter(v=>v).length,secondWalks=D.chart[0][4].filter(v=>v).length;const hrs=(mainWalks*0.83+secondWalks*0.25).toFixed(1);const laundry=D.chart[3][0].filter(v=>v).length;const bonus=D.chart[3][1].some(v=>v);const care=D.chart[1].reduce((a,t)=>a+t.filter(v=>v).length,0);return{mainWalks,secondWalks,hrs,laundry,bonus,care};}
+
+const TABS={
+  provider:[['chart','⭐ Chart'],['daily','📸 Daily'],['recap','💌 Recap'],['report','🏅 Report'],['inbox','📥 Inbox'],['members','💳 Members'],['intake','📋 Intake'],['sync','📡 Live Link'],['brand','🎨 Brand']],
+  client:[['portal',"🐾 Kylo's Week"],['survey','📝 Check-in'],['card','🏷️ Care Card'],['ask','✨ Add-ons']]
+};
+function buildTabs(){const tb=document.getElementById('tabs');tb.innerHTML='';TABS[role].forEach(([id,lbl],i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.textContent=lbl;b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(id);};tb.appendChild(b);});render(TABS[role][0][0]);}
+function render(id){currentId=id;const w=document.getElementById('wrap');w.innerHTML='';({chart:renderChart,daily:renderDaily,recap:renderRecap,report:renderReport,inbox:renderInbox,members:renderMembers,intake:renderIntake,sync:renderSync,brand:renderBrand,portal:renderPortal,survey:renderSurvey,card:renderCardView,ask:renderAsk})[id](w);}
+
+/* ===== CHART ===== */
+function renderChart(w){
+  const c=el(`<div class="card"><h2>Weekly Sticker Chart</h2><div class="sub">Tap each day it's done. ${roomUri?'Live — Kerem sees it within seconds.':'Feeds the recap & Kylo\'s portal.'}</div><div id="zh"></div>
+    ${roomUri?'':`<div style="margin-top:16px"><button class="btn k big-share" onclick="shareWeek()">📲 Share Kylo's week with Kerem</button></div><div id="sharebox" style="display:none;margin-top:12px"><label class="fld">If sharing didn't open, copy this & send it</label><textarea class="t" id="sharelink" rows="3" readonly onclick="this.select()" style="font-size:.78rem"></textarea></div>`}
+    <div class="btnrow noprint"><button class="btn p" onclick="window.print()">🖨️ Print</button><button class="btn" onclick="newWeek()">↺ New week</button><span class="sm">${roomUri?'🟢 Live sync on':'Saves on this device'}</span></div></div>`);
+  w.appendChild(c);const host=c.querySelector('#zh');
+  ZONES.forEach((z,zi)=>{const zd=el(`<div class="zone ${z.cls}"><div class="zone-h"><span>${z.title}</span><span class="days">${DAYS.map(d=>`<span>${d}</span>`).join('')}</span></div></div>`);
+    z.tasks.forEach((t,ti)=>{const sp=z.cls==='yel';const label=sp?(D.special[ti]||'Add a touch…'):t;const row=el(`<div class="row"><div class="task" ${sp?`contenteditable="true" data-sp="${ti}"`:''}>${label}</div><div class="dots">${DAYS.map((_,di)=>`<div class="dot ${D.chart[zi][ti][di]?'on':''}" data-z="${zi}" data-t="${ti}" data-d="${di}"></div>`).join('')}</div></div>`);zd.appendChild(row);});
+    host.appendChild(zd);});
+  host.querySelectorAll('.dot').forEach(d=>d.onclick=()=>{const z=+d.dataset.z,t=+d.dataset.t,dd=+d.dataset.d;D.chart[z][t][dd]^=1;d.classList.toggle('on');save();});
+  host.querySelectorAll('[data-sp]').forEach(e=>e.onblur=()=>{D.special[+e.dataset.sp]=e.textContent.trim();save();});
+}
+function newWeek(){if(confirm('Start a fresh week? Current ticks will clear.')){D.chart=blank().chart;save();render('chart');}}
+async function shareWeek(){const link=location.origin+location.pathname+'#k='+enc(D);if(navigator.share){try{await navigator.share({title:"Kylo's week 🐾",text:"Here's Kylo's week — tap to see it:",url:link});return;}catch(e){if(e&&e.name==='AbortError')return;}}const box=document.getElementById('sharebox'),ta=document.getElementById('sharelink');if(box){box.style.display='block';ta.value=link;ta.focus();ta.select();try{navigator.clipboard.writeText(link);}catch(e){}}}
+
+/* ===== DAILY ===== */
+const DAILY_Q=['Mood','Appetite','Energy','Bathroom','Behavior'];
+const DAILY_OPT={Mood:['😊 Happy','😌 Calm','😴 Sleepy','😟 Off'],Appetite:['Ate well','Had some','Skipped'],Energy:['High','Normal','Low'],Bathroom:['All normal','Something to note'],Behavior:['Great','Good','Needs note']};
+function renderDaily(w){
+  D.daily=D.daily||{date:'',walk:'',q:{},photos:'',note:''};
+  const c=el(`<div class="card"><h2>Daily Report 📸</h2><div class="sub">What happened today — fill, then share or copy.</div>
+    <div class="twocol"><div><label class="fld">Date</label><input class="t" id="d_date" value="${D.daily.date}"></div><div><label class="fld">Walk length</label><input class="t" id="d_walk" value="${D.daily.walk}" placeholder="e.g. 55 min"></div></div>
+    <div id="dq"></div><label class="fld">Photos (paste 1–3 links)</label><textarea class="t" id="d_ph" rows="2" placeholder="paste photo or album links">${D.daily.photos}</textarea>
+    <label class="fld">One line from today</label><input class="t" id="d_note" value="${D.daily.note}" placeholder="e.g. Made a beagle friend at the park">
+    <div class="btnrow noprint"><button class="btn k" onclick="genDaily()">✨ Generate</button><button class="btn p" onclick="shareDaily()">📲 Share</button><button class="btn" onclick="copyDaily()">📋 Copy</button></div>
+    <div class="recap" id="dout" style="margin-top:12px"></div></div>`);
+  w.appendChild(c);const dq=c.querySelector('#dq');
+  DAILY_Q.forEach(q=>{const cur=D.daily.q[q]||'';const row=el(`<div style="margin-top:6px"><label class="fld" style="margin-bottom:2px">${q}</label><div class="btnrow" style="margin-top:2px"></div></div>`);const br=row.querySelector('.btnrow');DAILY_OPT[q].forEach(o=>{const b=el(`<button class="btn" style="font-size:.78rem;background:${cur===o?'var(--mint)':'#fff'};box-shadow:0 2px 0 rgba(0,0,0,.08)">${o}</button>`);b.onclick=()=>{D.daily.q[q]=o;save();renderDaily(w);};br.appendChild(b);});dq.appendChild(row);});
+  ['d_date','d_walk','d_ph','d_note'].forEach(id=>{c.querySelector('#'+id).oninput=()=>{D.daily.date=c.querySelector('#d_date').value;D.daily.walk=c.querySelector('#d_walk').value;D.daily.photos=c.querySelector('#d_ph').value;D.daily.note=c.querySelector('#d_note').value;save();};});
+  genDaily();
+}
+function dailyText(){const d=D.daily;let t=`🐾 Kylo's Day — ${d.date||'today'}\n\n`;if(d.walk)t+=`Walk: ${d.walk}\n`;DAILY_Q.forEach(q=>{if(d.q[q])t+=`${q}: ${d.q[q]}\n`;});if(d.note)t+=`\n${d.note}\n`;if(d.photos)t+=`\nPhotos: ${d.photos}\n`;t+=`\n— Madeline · Kylo's Karetorium`;return t;}
+function genDaily(){const o=document.getElementById('dout');if(o)o.textContent=dailyText();}
+function copyDaily(){navigator.clipboard.writeText(dailyText());}
+async function shareDaily(){const t=dailyText();if(navigator.share){try{await navigator.share({title:"Kylo's day",text:t});return;}catch(e){if(e&&e.name==='AbortError')return;}}copyDaily();}
+
+/* ===== RECAP ===== */
+const TONES={warm:{greet:'Hi Kerem,',open:"A little look at Kylo's week:",close:"Have a restful weekend.\nMadeline · Kylo's Karetorium"},brief:{greet:'Hi Kerem,',open:"Quick recap of Kylo's week:",close:"Best,\nMadeline · Kylo's Karetorium"},playful:{greet:'Hi Kerem! 🐾',open:"Here's what Kylo got up to this week:",close:"Give him a scratch from me.\nMadeline · Kylo's Karetorium"},premium:{greet:'Good day, Kerem,',open:"Your weekly summary from Kylo's Karetorium:",close:"Warmly,\nMadeline · Kylo's Karetorium"}};
+const HIGHLIGHTS=["Kylo had great energy on his walks","He was calm and settled at home","He's responding really well to training","He made a new friend on the route","He napped happily after his walks","He was a little tired — kept it gentle","His coat's looking especially good","He loved the longer route this week","He was extra affectionate this week","Hot out — adjusted timing to protect his paws","He's getting much better with the harness","Quiet, easy week — just how we like it"];
+const SEEDS=['',"If dinners ever feel like one thing too many, the Hands-Off tier handles a few nights a week.","Whenever you'd like more outings added for Kylo, easy to arrange.","Personal laundry can join the household load anytime — just say the word.","If you'd ever like the fridge stocked and dinners started, the premium tier covers it end to end.","Anything else you'd like handled — just reply and we'll sort it out."];
+function renderRecap(w){
+  D.recapTone=D.recapTone||'warm';D.highlights=D.highlights||[];
+  const c=el(`<div class="card"><h2>Weekly Recap 💌</h2><div class="sub">Pulls from the chart. Pick a tone and what's true — the email writes itself.</div>
+    <label class="fld">Tone</label><div class="btnrow" id="tones" style="margin-top:0"></div>
+    <label class="fld">What happened this week — tap anything true</label><div id="hl" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px"></div>
+    <label class="fld">Your own note (optional)</label><input class="t" id="dt" value="${D.detail||''}" placeholder="e.g. He learned 'wait' at the door">
+    <div class="twocol"><div><label class="fld">Photos sent</label><input class="t" id="ph" value="${D.photos||''}" placeholder="e.g. 14"></div><div><label class="fld">Album link (optional)</label><input class="t" id="al" value="${D.album||''}" placeholder="paste link"></div></div>
+    <label class="fld">Add-on mention (optional)</label><select class="t" id="seed">${SEEDS.map((s,i)=>`<option value="${s.replace(/"/g,'&quot;')}">${i===0?'— none this week —':s.length>62?s.substring(0,62)+'…':s}</option>`).join('')}</select>
+    <div class="btnrow noprint"><button class="btn k" onclick="genRecap()">✨ Generate</button><button class="btn p" onclick="shareRecap()">📲 Share</button><button class="btn" onclick="copyRecap()">📋 Copy</button></div>
+    <div class="recap" id="out" style="margin-top:12px"></div></div>`);
+  w.appendChild(c);const tn=c.querySelector('#tones');
+  Object.keys(TONES).forEach(k=>{const b=el(`<button class="btn ${D.recapTone===k?'p':''}" style="text-transform:capitalize">${k}</button>`);b.onclick=()=>{D.recapTone=k;save();renderRecap(w);};tn.appendChild(b);});
+  const hl=c.querySelector('#hl');HIGHLIGHTS.forEach(h=>{const on=D.highlights.includes(h);const chip=el(`<button class="btn" style="background:${on?'var(--mint)':'#fff'};box-shadow:0 2px 0 rgba(0,0,0,.08);font-size:.79rem">${on?'✓ ':''}${h}</button>`);chip.onclick=()=>{D.highlights=on?D.highlights.filter(x=>x!==h):[...D.highlights,h];save();renderRecap(w);};hl.appendChild(chip);});
+  c.querySelector('#dt').oninput=e=>{D.detail=e.target.value;save();};c.querySelector('#ph').oninput=e=>{D.photos=e.target.value;save();};c.querySelector('#al').oninput=e=>{D.album=e.target.value;save();};
+  genRecap();
+}
+function recapText(){const m=metrics(),T=TONES[D.recapTone||'warm'];const ph=document.getElementById('ph')?.value||'a few',al=document.getElementById('al')?.value||'',note=document.getElementById('dt')?.value||'',seed=document.getElementById('seed')?.value||'',hs=D.highlights||[];let t=`Subject: Kylo's week 🐾\n\n${T.greet}\n\n${T.open}\n\n`;t+=`• ${m.mainWalks} walk${m.mainWalks===1?'':'s'} — about ${m.hrs} hours outdoors + play\n`;t+=`• Daily care: fresh water, feeding, eyes, paws, grooming & enrichment\n`;t+=`• ${m.laundry} load${m.laundry===1?'':'s'} of laundry — washed, folded, away\n`;t+=`• Surfaces reset all week${m.bonus?' · deep bathroom done ✓':''}\n`;t+=`• ${ph} photos sent along the way${al?` (album: ${al})`:''}\n\n`;if(hs.length)t+=hs.slice(0,3).join('. ')+'.\n';if(note)t+=note+'\n';if(hs.length||note)t+='\n';if(seed)t+=seed+'\n\n';t+=T.close;return t;}
+function genRecap(){const o=document.getElementById('out');if(o)o.textContent=recapText();}
+function copyRecap(){navigator.clipboard.writeText(recapText());}
+async function shareRecap(){const t=recapText();if(navigator.share){try{await navigator.share({title:"Kylo's week",text:t});return;}catch(e){if(e&&e.name==='AbortError')return;}}copyRecap();}
+
+/* ===== REPORT CARD ===== */
+function renderReport(w){const m=metrics();const c=el(`<div class="card"><h2>Monthly Report Card 🏅</h2><div class="sub">Kylo's month, all in one place.</div><div class="twocol"><div><label class="fld">Month</label><input class="t" id="mo" value="${D.week||'June 2026'}"></div><div><label class="fld">Walks this month</label><input class="t" value="${m.mainWalks}" disabled></div></div><div id="gr" style="margin-top:14px"></div><label class="fld">Note from Madeline</label><textarea class="t" id="nt" rows="3" placeholder="Kylo had a great month…">${D.note||''}</textarea><div class="btnrow noprint"><button class="btn p" onclick="window.print()">🖨️ Print</button></div></div>`);w.appendChild(c);const grades=['Walks & exercise','Happiness & energy','Grooming & care','Calm, handled home','Overall'];const g=c.querySelector('#gr');grades.forEach(name=>g.appendChild(el(`<div class="grade"><span style="font-weight:700">${name}</span><span class="stars">★★★★★</span></div>`)));c.querySelector('#nt').oninput=e=>{D.note=e.target.value;save();};c.querySelector('#mo').oninput=e=>{D.week=e.target.value;save();};}
+
+/* ===== INBOX (Kerem's check-in flows here) ===== */
+function renderInbox(w){
+  const s=D.survey;
+  let body;
+  if(s){
+    body=`<div class="banner">📬 New check-in from Kerem${s.at?` · ${s.at}`:''}</div>
+      <div style="margin-top:14px"><span class="pill" style="background:var(--lilac);color:var(--purple)">Week</span> <b>${s.week||'—'}</b></div>
+      <div style="margin-top:8px"><span class="pill" style="background:var(--lilac);color:var(--purple)">Kylo</span> <b>${s.kylo||'—'}</b></div>
+      ${s.addon&&s.addon!=='No thanks'?`<div style="margin-top:8px"><span class="pill" style="background:var(--mint);color:#fff">Add-on interest</span> <b>${s.addon}</b></div>`:''}
+      ${s.adjust?`<div class="quote" style="margin-top:12px"><b style="font-style:normal">Wants adjusted:</b> ${s.adjust}</div>`:''}
+      ${s.notes?`<div class="quote" style="margin-top:10px">“${s.notes}”</div>`:''}
+      <div class="btnrow noprint"><a class="btn p" href="mailto:keremgurpinar@nyu.edu?subject=Re%3A%20Kylo%20check-in&body=Hi%20Kerem,%0A%0A">✉️ Reply to Kerem</a></div>`;
+  }else{
+    body=`<div class="sm">No check-in yet this week. When Kerem submits his Friday check-in from his portal, it lands here automatically.</div>`;
+  }
+  w.appendChild(el(`<div class="card"><h2>Inbox 📥</h2><div class="sub">Kerem's weekly check-in — straight to you.</div>${body}</div>`));
+}
+
+/* ===== MEMBERS ===== */
+function renderMembers(w){const m=D.member;const c=el(`<div class="card"><h2>Members 💳</h2><div class="sub">Current care clients.</div><div class="twocol"><div><label class="fld">Name</label><input class="t" id="mn" value="${m.name}"></div><div><label class="fld">Tier</label><select class="t" id="mt"><option ${m.tier==='WALKS + RESET'?'selected':''}>WALKS + RESET</option><option ${m.tier==='Hands-Off'?'selected':''}>Hands-Off</option><option ${m.tier==='Hands-Off Premium'?'selected':''}>Hands-Off Premium</option></select></div><div><label class="fld">Member since</label><input class="t" id="ms" value="${m.since}"></div><div><label class="fld">Member no.</label><input class="t" id="mno" value="${m.no}"></div></div><div style="display:flex;justify-content:center;margin:22px 0"><div class="carecard" id="vc"></div></div><div class="btnrow noprint"><button class="btn p" onclick="window.print()">🖨️ Print</button></div></div>`);w.appendChild(c);['mn','mt','ms','mno'].forEach(id=>c.querySelector('#'+id).oninput=()=>{D.member={name:c.querySelector('#mn').value,tier:c.querySelector('#mt').value,since:c.querySelector('#ms').value,no:c.querySelector('#mno').value};save();drawCard(c.querySelector('#vc'));});drawCard(c.querySelector('#vc'));}
+function drawCard(node){const m=D.member;node.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><svg width="26" height="26" viewBox="0 0 100 100"><polygon points="50,4 60,32 90,30 66,50 78,80 50,62 22,80 34,50 10,30 40,32" fill="#FFD23F" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg><div style="font-family:'Fredoka';font-weight:700;font-size:1.18rem;letter-spacing:.3px">Kylo's Karetorium</div></div><div style="font-size:.64rem;letter-spacing:1.4px;opacity:.8;text-transform:uppercase;margin:4px 0 18px">Care Member</div><div style="font-size:1.15rem;font-weight:800">${m.name}</div><div style="font-size:.82rem;opacity:.92;margin-top:3px">${m.tier}</div><div style="font-size:.74rem;opacity:.82;margin-top:16px;display:flex;justify-content:space-between"><span>Since ${m.since}</span><span>${m.no}</span></div>`;}
+
+/* ===== INTAKE ===== */
+function renderIntake(w){w.appendChild(el(`<div class="card"><h2>Client Intake 📋</h2><div class="sub">Fill in once — vet info, routine, and notes.</div><div class="twocol"><div><label class="fld">Primary vet</label><input class="t"></div><div><label class="fld">Vet phone</label><input class="t"></div><div><label class="fld">24h emergency vet</label><input class="t"></div><div><label class="fld">Owner cell</label><input class="t"></div></div><label class="fld">Meals — when & how much (owner provides food)</label><input class="t"><div class="twocol"><div><label class="fld">Treats / limits</label><input class="t"></div><div><label class="fld">Commands Kylo knows</label><input class="t"></div><div><label class="fld">Allergies / sensitivities</label><input class="t"></div><div><label class="fld">Fears / triggers</label><input class="t"></div></div><label class="fld">Supplies location & building / key notes</label><textarea class="t" rows="2"></textarea><div class="btnrow noprint"><button class="btn p" onclick="window.print()">🖨️ Print</button></div></div>`));}
+
+/* ===== LIVE LINK (setup) ===== */
+function renderSync(w){
+  const link=liveLink();
+  let inner;
+  if(roomUri&&link){
+    inner=`<div class="banner">🟢 Live link active — you both see updates within seconds</div>
+      <label class="fld" style="margin-top:14px">Your one link — send it to Kerem & bookmark it</label>
+      <textarea class="t" id="ll" rows="3" readonly onclick="this.select()" style="font-size:.78rem">${link}</textarea>
+      <div class="btnrow noprint"><button class="btn k" onclick="shareLive()">📲 Send to Kerem</button><button class="btn" onclick="copyLive()">📋 Copy</button></div>
+      <div class="quote" style="margin-top:14px">He taps <b style="font-style:normal">🐾 Kylo's Portal</b>; you tap <b style="font-style:normal">🎀 Care HQ</b> (password kylo2026). Tap a sticker — it shows on his phone in seconds. His Friday check-in lands in your Inbox the same way.</div>`;
+  }else{
+    inner=`<div class="banner" style="background:linear-gradient(120deg,#9A93A8,#c4bdd0)">⚪ Not live yet</div>
+      <p class="sm" style="margin-top:12px">Tap below to create your free live link. One link, both of you, always current — no accounts, no cost. (You'll host the file once; steps below.)</p>
+      <div class="btnrow"><button class="btn p big-share" onclick="makeLive(this)">✨ Create my live link</button></div>
+      <h3 style="color:var(--purple);margin:18px 0 6px;font-size:1.05rem">Put it online (one time, free, ~3 min)</h3>
+      <ol style="font-size:.9rem;line-height:1.65;padding-left:20px"><li>Download this file (the ⋯ menu → Download).</li><li>Go to <b>app.netlify.com/drop</b> and drag the file onto the page.</li><li>It gives you a real web address — open it, come back here, and tap "Create my live link."</li></ol>
+      <p class="sm" style="margin-top:10px">Inside this preview the live link can't be created (the preview blocks outside servers) — it works the moment the file is hosted.</p>`;
+  }
+  w.appendChild(el(`<div class="card"><h2>Live Link 📡</h2><div class="sub">One link, always current, for both of you.</div>${inner}</div>`));
+}
+async function makeLive(btn){btn.textContent='Creating…';const ok=await createRoom();if(ok){await pushProvider();render('sync');}else{btn.textContent='Couldn\'t reach the sync service — host the file first, then try again';}}
+function copyLive(){const l=liveLink();if(l)navigator.clipboard.writeText(l);}
+async function shareLive(){const l=liveLink();if(!l)return;if(navigator.share){try{await navigator.share({title:"Kylo's care portal",text:"Here's Kylo's live care portal — tap Kylo's Portal to see his week anytime 🐾",url:l});return;}catch(e){if(e&&e.name==='AbortError')return;}}copyLive();}
+
+/* ===== BRAND ===== */
+function renderBrand(w){w.appendChild(el(`<div class="card"><h2>Brand 🎨</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px">${['#FF5BA8','#8B47E0','#16B9F5','#0AE3C4','#FFD23F'].map(c=>`<div style="flex:1;min-width:80px;height:60px;border-radius:14px;background:${c};box-shadow:0 6px 14px -8px ${c}"></div>`).join('')}</div><p style="line-height:1.9;font-size:.95rem"><b>Display:</b> Fredoka &nbsp;·&nbsp; <b>Body:</b> Nunito<br><b>Voice:</b> warm, direct, professional<br><b>Tiers:</b> WALKS + RESET → Hands-Off → Hands-Off Premium<br><b>Tagline:</b> <em>Cared for like the star he is.</em></p></div>`));}
+
+/* ===== CLIENT: PORTAL ===== */
+function renderPortal(w){
+  const m=metrics();const photoLine=(D.photos&&(''+D.photos).trim())?`${D.photos} photos`:'';
+  const c=el(`<div class="card"><h2>Kylo's Week 🐾</h2><div class="sub">Everything happening while you're at work.</div>
+    <div class="statgrid"><div class="stat"><div class="big">${m.mainWalks}</div><div class="l">Walks</div></div><div class="stat"><div class="big">${m.hrs}</div><div class="l">Hours outside</div></div><div class="stat"><div class="big">${m.care}</div><div class="l">Care moments</div></div><div class="stat"><div class="big">${m.laundry}</div><div class="l">Loads done</div></div></div>
+    ${(D.daily&&D.daily.note)?`<div class="quote">“${D.daily.note}” <span style="font-style:normal;font-weight:700;color:var(--purple)">— Madeline</span></div>`:''}
+    <div style="margin-top:12px">${ZONES.slice(0,2).map((z,zi)=>`<div class="zone ${z.cls}"><div class="zone-h"><span>${z.title}</span></div>${z.tasks.map((t,ti)=>`<div class="row"><div class="task">${t}</div><div class="sm" style="font-weight:700;color:var(--purple)">${D.chart[zi][ti].filter(v=>v).length}/5</div></div>`).join('')}</div>`).join('')}</div>
+    ${m.bonus?`<div class="banner">★ Bonus this week: deep bathroom clean — on the house.</div>`:''}
+    ${photoLine?`<div class="sm" style="margin-top:12px;text-align:center">📸 ${photoLine} sent your way${D.album?` · <a href="${D.album}" style="color:var(--pink);font-weight:700">view album</a>`:''}</div>`:''}
+    <div class="btnrow noprint" style="margin-top:16px;justify-content:center"><a class="btn p" href="mailto:madmamu444@gmail.com?subject=Kylo%20%E2%80%94%20a%20note&body=Hi%20Madeline,%0A%0A">✉️ Message Madeline</a></div></div>`);
+  w.appendChild(c);
+}
+
+/* ===== CLIENT: CHECK-IN (flows back to Inbox) ===== */
+const SV_OPT={week:['Great','Good','Could be better'],kylo:['Happy & well','Fine','A little off'],addon:['No thanks','Tell me about Hands-Off','Tell me about Premium']};
+function renderSurvey(w){
+  const s=D.survey||{};
+  const c=el(`<div class="card"><h2>Weekly Check-in 📝</h2><div class="sub">A quick note to Madeline — how was the week?</div>
+    <label class="fld">How was the week?</label><div class="btnrow" id="sv_week" style="margin-top:0"></div>
+    <label class="fld">How's Kylo doing?</label><div class="btnrow" id="sv_kylo" style="margin-top:0"></div>
+    <label class="fld">Anything you'd like adjusted?</label><input class="t" id="sv_adjust" value="${s.adjust||''}" placeholder="optional">
+    <label class="fld">Curious about anything extra?</label><div class="btnrow" id="sv_addon" style="margin-top:0"></div>
+    <label class="fld">Notes for Madeline</label><textarea class="t" id="sv_notes" rows="2" placeholder="optional">${s.notes||''}</textarea>
+    <div class="btnrow"><button class="btn k big-share" id="svBtn" onclick="submitSurvey(this)">Send my check-in ✓</button></div>
+    <div id="svDone"></div></div>`);
+  w.appendChild(c);
+  const sel={week:s.week,kylo:s.kylo,addon:s.addon};
+  ['week','kylo','addon'].forEach(key=>{const box=c.querySelector('#sv_'+key);SV_OPT[key].forEach(o=>{const b=el(`<button class="btn" data-k="${key}" data-v="${o}" style="font-size:.8rem;background:${sel[key]===o?'var(--mint)':'#fff'};box-shadow:0 2px 0 rgba(0,0,0,.08)">${o}</button>`);b.onclick=()=>{sel[key]=o;box.querySelectorAll('button').forEach(x=>x.style.background='#fff');b.style.background='var(--mint)';c._sel=sel;};box.appendChild(b);});});
+  c._sel=sel;
+}
+async function submitSurvey(btn){
+  const c=btn.closest('.card');const sel=c._sel||{};
+  const ans={week:sel.week||'',kylo:sel.kylo||'',addon:sel.addon||'',adjust:c.querySelector('#sv_adjust').value,notes:c.querySelector('#sv_notes').value,at:new Date().toLocaleDateString()};
+  btn.textContent='Sending…';
+  if(roomUri){const remote=await apiGet(roomUri);const base=remote||D;base.survey=ans;await apiPut(roomUri,base);D=base;lastSeen=JSON.stringify(D);}
+  else{D.survey=ans;}
+  document.getElementById('svDone').innerHTML=`<div class="banner" style="margin-top:14px">✓ Sent to Madeline — thank you!</div>`;
+  btn.textContent='Sent ✓';
+}
+
+/* ===== CLIENT: CARE CARD ===== */
+function renderCardView(w){const c=el(`<div class="card"><h2>Your Care Card 🏷️</h2><div class="sub">Your membership on file.</div><div style="display:flex;justify-content:center;margin:18px 0"><div class="carecard" id="vc2"></div></div></div>`);w.appendChild(c);drawCard(c.querySelector('#vc2'));}
+
+/* ===== CLIENT: ADD-ONS ===== */
+function renderAsk(w){w.appendChild(el(`<div class="card"><h2>Want to add anything? ✨</h2><div class="sub">Available whenever — no pressure. Use your weekly check-in or reach out.</div><div class="upsell"><b>Hands-Off</b><p>Dinner started and prepped a few nights a week. You walk in at 6 to food going.</p></div><div class="upsell" style="background:linear-gradient(135deg,var(--blue),var(--mint));color:var(--ink)"><b>Hands-Off Premium</b><p>Full dinners with ingredients included, plus personal laundry. Nothing to think about.</p></div><div class="btnrow" style="justify-content:center"><a class="btn p" href="mailto:madmamu444@gmail.com?subject=Add-on%20%E2%80%94%20tell%20me%20more&body=Hi%20Madeline,%0A%0AI'd%20like%20to%20hear%20more%20about%20">✉️ Tell me more</a></div></div>`));}
+
+function el(html){const d=document.createElement('div');d.innerHTML=html.trim();return d.firstChild;}
+</script>
+</body>
+</html>
